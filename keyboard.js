@@ -1,11 +1,25 @@
-// Virtual Keyboard for Pi OS
-console.log('Virtual Keyboard Loading...');
+// Virtual Keyboard AZERTY for Pi OS
+console.log('Virtual Keyboard AZERTY Loading...');
 
 let currentInput = null;
 let shiftActive = false;
 let keyboard = null;
+let longPressTimer = null;
+let currentAccentMenu = null;
 
-// Create keyboard HTML
+// Accent mappings for French AZERTY
+const accentMap = {
+  'a': ['à', 'á', 'â', 'ä', 'ã', 'å'],
+  'e': ['è', 'é', 'ê', 'ë'],
+  'i': ['ì', 'í', 'î', 'ï'],
+  'o': ['ò', 'ó', 'ô', 'ö', 'õ', 'ø'],
+  'u': ['ù', 'ú', 'û', 'ü'],
+  'c': ['ç'],
+  'n': ['ñ'],
+  'y': ['ÿ']
+};
+
+// Create keyboard HTML with AZERTY layout
 function createKeyboard() {
   if (keyboard) return;
   
@@ -14,68 +28,155 @@ function createKeyboard() {
   
   keyboard.innerHTML = `
     <div class="kb-header">
-      <span>Virtual Keyboard</span>
+      <span>Clavier Virtuel AZERTY</span>
       <button class="kb-close" onclick="hideKeyboard()">×</button>
     </div>
     <div class="kb-row">
-      <button class="kb-key" data-key="1">1</button>
-      <button class="kb-key" data-key="2">2</button>
-      <button class="kb-key" data-key="3">3</button>
-      <button class="kb-key" data-key="4">4</button>
-      <button class="kb-key" data-key="5">5</button>
-      <button class="kb-key" data-key="6">6</button>
-      <button class="kb-key" data-key="7">7</button>
-      <button class="kb-key" data-key="8">8</button>
-      <button class="kb-key" data-key="9">9</button>
-      <button class="kb-key" data-key="0">0</button>
+      <button class="kb-key" data-key="&" data-shift="1">&</button>
+      <button class="kb-key" data-key="é" data-shift="2">é</button>
+      <button class="kb-key" data-key='"' data-shift="3">"</button>
+      <button class="kb-key" data-key="'" data-shift="4">'</button>
+      <button class="kb-key" data-key="(" data-shift="5">(</button>
+      <button class="kb-key" data-key="-" data-shift="6">-</button>
+      <button class="kb-key" data-key="è" data-shift="7">è</button>
+      <button class="kb-key" data-key="_" data-shift="8">_</button>
+      <button class="kb-key" data-key="ç" data-shift="9">ç</button>
+      <button class="kb-key" data-key="à" data-shift="0">à</button>
+      <button class="kb-key" data-key=")" data-shift="°">)</button>
       <button class="kb-key wide" data-action="backspace">⌫</button>
     </div>
     <div class="kb-row">
-      <button class="kb-key" data-key="q">q</button>
-      <button class="kb-key" data-key="w">w</button>
-      <button class="kb-key" data-key="e">e</button>
-      <button class="kb-key" data-key="r">r</button>
-      <button class="kb-key" data-key="t">t</button>
-      <button class="kb-key" data-key="y">y</button>
-      <button class="kb-key" data-key="u">u</button>
-      <button class="kb-key" data-key="i">i</button>
-      <button class="kb-key" data-key="o">o</button>
-      <button class="kb-key" data-key="p">p</button>
+      <button class="kb-key" data-key="a" data-shift="A" data-accents="true">a</button>
+      <button class="kb-key" data-key="z" data-shift="Z">z</button>
+      <button class="kb-key" data-key="e" data-shift="E" data-accents="true">e</button>
+      <button class="kb-key" data-key="r" data-shift="R">r</button>
+      <button class="kb-key" data-key="t" data-shift="T">t</button>
+      <button class="kb-key" data-key="y" data-shift="Y" data-accents="true">y</button>
+      <button class="kb-key" data-key="u" data-shift="U" data-accents="true">u</button>
+      <button class="kb-key" data-key="i" data-shift="I" data-accents="true">i</button>
+      <button class="kb-key" data-key="o" data-shift="O" data-accents="true">o</button>
+      <button class="kb-key" data-key="p" data-shift="P">p</button>
+      <button class="kb-key" data-key="^" data-shift="¨">^</button>
+      <button class="kb-key" data-key="$" data-shift="£">$</button>
     </div>
     <div class="kb-row">
-      <button class="kb-key" data-key="a">a</button>
-      <button class="kb-key" data-key="s">s</button>
-      <button class="kb-key" data-key="d">d</button>
-      <button class="kb-key" data-key="f">f</button>
-      <button class="kb-key" data-key="g">g</button>
-      <button class="kb-key" data-key="h">h</button>
-      <button class="kb-key" data-key="j">j</button>
-      <button class="kb-key" data-key="k">k</button>
-      <button class="kb-key" data-key="l">l</button>
-      <button class="kb-key wide" data-action="enter">⏎</button>
+      <button class="kb-key" data-key="q" data-shift="Q">q</button>
+      <button class="kb-key" data-key="s" data-shift="S">s</button>
+      <button class="kb-key" data-key="d" data-shift="D">d</button>
+      <button class="kb-key" data-key="f" data-shift="F">f</button>
+      <button class="kb-key" data-key="g" data-shift="G">g</button>
+      <button class="kb-key" data-key="h" data-shift="H">h</button>
+      <button class="kb-key" data-key="j" data-shift="J">j</button>
+      <button class="kb-key" data-key="k" data-shift="K">k</button>
+      <button class="kb-key" data-key="l" data-shift="L">l</button>
+      <button class="kb-key" data-key="m" data-shift="M">m</button>
+      <button class="kb-key" data-key="ù" data-shift="%">ù</button>
+      <button class="kb-key wide" data-action="return">↵</button>
     </div>
     <div class="kb-row">
-      <button class="kb-key wide" data-action="shift">⇧</button>
-      <button class="kb-key" data-key="z">z</button>
-      <button class="kb-key" data-key="x">x</button>
-      <button class="kb-key" data-key="c">c</button>
-      <button class="kb-key" data-key="v">v</button>
-      <button class="kb-key" data-key="b">b</button>
-      <button class="kb-key" data-key="n">n</button>
-      <button class="kb-key" data-key="m">m</button>
-      <button class="kb-key" data-key=",">,</button>
-      <button class="kb-key" data-key=".">.</button>
+      <button class="kb-key extra-wide" data-action="shift">⇧</button>
+      <button class="kb-key" data-key="w" data-shift="W">w</button>
+      <button class="kb-key" data-key="x" data-shift="X">x</button>
+      <button class="kb-key" data-key="c" data-shift="C" data-accents="true">c</button>
+      <button class="kb-key" data-key="v" data-shift="V">v</button>
+      <button class="kb-key" data-key="b" data-shift="B">b</button>
+      <button class="kb-key" data-key="n" data-shift="N" data-accents="true">n</button>
+      <button class="kb-key" data-key="," data-shift="?">,</button>
+      <button class="kb-key" data-key=";" data-shift=".">;</button>
+      <button class="kb-key" data-key=":" data-shift="/">:</button>
+      <button class="kb-key" data-key="!" data-shift="§">!</button>
     </div>
     <div class="kb-row">
-      <button class="kb-key space" data-action="space">Space</button>
+      <button class="kb-key space" data-action="space">Espace</button>
     </div>
   `;
   
   document.body.appendChild(keyboard);
   
-  // Add click handlers
+  // Add event handlers
+  keyboard.addEventListener('mousedown', handleMouseDown);
+  keyboard.addEventListener('mouseup', handleMouseUp);
+  keyboard.addEventListener('mouseleave', handleMouseLeave);
   keyboard.addEventListener('click', handleKeyClick);
   keyboard.addEventListener('mousedown', e => e.preventDefault());
+}
+
+// Handle mouse down for long press
+function handleMouseDown(e) {
+  const key = e.target;
+  if (!key.classList.contains('kb-key') || !key.dataset.accents) return;
+  
+  const letter = key.dataset.key.toLowerCase();
+  if (!accentMap[letter]) return;
+  
+  // Start long press timer
+  longPressTimer = setTimeout(() => {
+    showAccentMenu(key, letter);
+    key.classList.add('long-press');
+  }, 500);
+}
+
+// Handle mouse up
+function handleMouseUp(e) {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+  
+  const key = e.target;
+  if (key.classList.contains('kb-key')) {
+    key.classList.remove('long-press');
+  }
+}
+
+// Handle mouse leave
+function handleMouseLeave(e) {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+  
+  const key = e.target;
+  if (key.classList.contains('kb-key')) {
+    key.classList.remove('long-press');
+  }
+}
+
+// Show accent menu
+function showAccentMenu(keyElement, letter) {
+  hideAccentMenu();
+  
+  const accents = accentMap[letter];
+  if (!accents) return;
+  
+  const menu = document.createElement('div');
+  menu.className = 'accent-menu show';
+  
+  accents.forEach(accent => {
+    const option = document.createElement('button');
+    option.className = 'accent-option';
+    option.textContent = accent;
+    option.onclick = () => {
+      typeCharacter(accent);
+      hideAccentMenu();
+    };
+    menu.appendChild(option);
+  });
+  
+  keyElement.appendChild(menu);
+  currentAccentMenu = menu;
+}
+
+// Hide accent menu
+function hideAccentMenu() {
+  if (currentAccentMenu) {
+    currentAccentMenu.remove();
+    currentAccentMenu = null;
+  }
+  
+  // Remove long-press class from all keys
+  const longPressKeys = keyboard.querySelectorAll('.kb-key.long-press');
+  longPressKeys.forEach(key => key.classList.remove('long-press'));
 }
 
 // Show keyboard
@@ -92,6 +193,7 @@ function hideKeyboard() {
     keyboard.style.display = 'none';
     currentInput = null;
     shiftActive = false;
+    hideAccentMenu();
     updateShiftState();
   }
 }
@@ -104,7 +206,13 @@ function handleKeyClick(e) {
   const key = e.target;
   if (!key.classList.contains('kb-key')) return;
   
-  const keyValue = key.dataset.key;
+  // Don't process click if accent menu is showing
+  if (currentAccentMenu) {
+    hideAccentMenu();
+    return;
+  }
+  
+  const keyValue = shiftActive ? key.dataset.shift : key.dataset.key;
   const action = key.dataset.action;
   
   if (!currentInput) return;
@@ -113,6 +221,12 @@ function handleKeyClick(e) {
     handleSpecialKey(action);
   } else if (keyValue) {
     typeCharacter(keyValue);
+    
+    // Reset shift after typing letter (except for special chars)
+    if (shiftActive && keyValue.match(/[a-zA-Z]/)) {
+      shiftActive = false;
+      updateShiftState();
+    }
   }
 }
 
@@ -122,8 +236,8 @@ function handleSpecialKey(action) {
     case 'backspace':
       handleBackspace();
       break;
-    case 'enter':
-      handleEnter();
+    case 'return':
+      handleReturn();
       break;
     case 'shift':
       toggleShift();
@@ -136,12 +250,6 @@ function handleSpecialKey(action) {
 
 // Type character
 function typeCharacter(char) {
-  if (shiftActive && char.match(/[a-z]/)) {
-    char = char.toUpperCase();
-    shiftActive = false;
-    updateShiftState();
-  }
-  
   const start = currentInput.selectionStart || 0;
   const end = currentInput.selectionEnd || 0;
   const value = currentInput.value || '';
@@ -171,22 +279,16 @@ function handleBackspace() {
   currentInput.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-// Handle enter
-function handleEnter() {
-  if (currentInput.tagName === 'TEXTAREA') {
-    typeCharacter('\n');
-  } else {
-    const form = currentInput.closest('form');
-    if (form) {
-      form.dispatchEvent(new Event('submit', { bubbles: true }));
-    }
-  }
+// Handle return (always new line)
+function handleReturn() {
+  typeCharacter('\n');
 }
 
 // Toggle shift
 function toggleShift() {
   shiftActive = !shiftActive;
   updateShiftState();
+  updateKeyLabels();
 }
 
 // Update shift state
@@ -199,6 +301,19 @@ function updateShiftState() {
       shiftKey.classList.remove('shift-active');
     }
   }
+}
+
+// Update key labels based on shift state
+function updateKeyLabels() {
+  const keys = keyboard.querySelectorAll('.kb-key[data-key]');
+  keys.forEach(key => {
+    const normalKey = key.dataset.key;
+    const shiftKey = key.dataset.shift;
+    
+    if (shiftKey) {
+      key.textContent = shiftActive ? shiftKey : normalKey;
+    }
+  });
 }
 
 // Check if element is text input
@@ -226,4 +341,11 @@ document.addEventListener('focus', function(e) {
   }
 }, true);
 
-console.log('Virtual Keyboard Ready!');
+// Hide accent menu when clicking outside
+document.addEventListener('click', function(e) {
+  if (currentAccentMenu && !currentAccentMenu.contains(e.target)) {
+    hideAccentMenu();
+  }
+});
+
+console.log('Virtual Keyboard AZERTY Ready!');

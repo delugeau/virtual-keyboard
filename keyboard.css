@@ -6,31 +6,34 @@
     background: #333;
     border: 2px solid #555;
     border-radius: 8px 8px 0 0;
-    padding: 15px;
+    padding: 20px;
     z-index: 999999;
     font-family: Arial, sans-serif;
     display: none;
     box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+    min-width: 800px;
   }
   
   .kb-row {
     display: flex;
     justify-content: center;
-    margin: 3px 0;
+    margin: 4px 0;
   }
   
   .kb-key {
     background: #555;
     color: white;
     border: 1px solid #777;
-    border-radius: 4px;
-    padding: 10px 15px;
-    margin: 2px;
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin: 3px;
     cursor: pointer;
-    font-size: 14px;
-    min-width: 35px;
+    font-size: 18px;
+    min-width: 50px;
+    min-height: 50px;
     text-align: center;
     user-select: none;
+    position: relative;
   }
   
   .kb-key:hover {
@@ -42,32 +45,75 @@
   }
   
   .kb-key.wide {
-    min-width: 80px;
+    min-width: 120px;
+  }
+  
+  .kb-key.extra-wide {
+    min-width: 160px;
   }
   
   .kb-key.space {
-    min-width: 200px;
+    min-width: 300px;
   }
   
   .kb-key.shift-active {
     background: #4CAF50;
   }
   
+  .kb-key.long-press {
+    background: #2196F3;
+  }
+  
   .kb-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: white;
-    font-size: 14px;
+    font-size: 16px;
   }
   
   .kb-close {
     background: #f44336;
     color: white;
     border: none;
-    border-radius: 3px;
-    padding: 5px 10px;
+    border-radius: 4px;
+    padding: 8px 15px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
+  }
+  
+  /* Accent menu */
+  .accent-menu {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 6px;
+    padding: 5px;
+    display: none;
+    z-index: 1000000;
+    margin-bottom: 5px;
+  }
+  
+  .accent-menu.show {
+    display: flex;
+  }
+  
+  .accent-option {
+    background: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 2px;
+    cursor: pointer;
+    font-size: 16px;
+    min-width: 35px;
+  }
+  
+  .accent-option:hover {
+    background: #666;
   }
