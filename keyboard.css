@@ -1,102 +1,73 @@
 #virtual-keyboard {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2c3e50;
-  border-radius: 8px 8px 0 0;
-  padding: 15px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
-  font-family: Arial, sans-serif;
-  display: none;
-  min-width: 600px;
-  max-width: 90vw;
-}
-
-.keyboard-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
-  gap: 4px;
-}
-
-.keyboard-key {
-  background: #34495e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 12px;
-  margin: 2px;
-  cursor: pointer;
-  font-size: 14px;
-  min-width: 40px;
-  min-height: 40px;
-  transition: background-color 0.2s;
-  user-select: none;
-}
-
-.keyboard-key:hover {
-  background: #4a6741;
-}
-
-.keyboard-key:active {
-  background: #5a7751;
-  transform: scale(0.95);
-}
-
-.keyboard-key.space {
-  min-width: 200px;
-}
-
-.keyboard-key.backspace,
-.keyboard-key.enter,
-.keyboard-key.shift,
-.keyboard-key.tab {
-  min-width: 80px;
-  font-size: 12px;
-}
-
-.keyboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  color: white;
-}
-
-.keyboard-close {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.keyboard-close:hover {
-  background: #c0392b;
-}
-
-.shift-active {
-  background: #27ae60 !important;
-}
-
-@media (max-width: 768px) {
-  #virtual-keyboard {
-    min-width: 95vw;
-    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    border: 2px solid #555;
+    border-radius: 8px 8px 0 0;
+    padding: 15px;
+    z-index: 999999;
+    font-family: Arial, sans-serif;
+    display: none;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
   }
   
-  .keyboard-key {
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    margin: 3px 0;
+  }
+  
+  .kb-key {
+    background: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin: 2px;
+    cursor: pointer;
+    font-size: 14px;
     min-width: 35px;
-    min-height: 35px;
-    padding: 8px;
+    text-align: center;
+    user-select: none;
+  }
+  
+  .kb-key:hover {
+    background: #666;
+  }
+  
+  .kb-key:active {
+    background: #777;
+  }
+  
+  .kb-key.wide {
+    min-width: 80px;
+  }
+  
+  .kb-key.space {
+    min-width: 200px;
+  }
+  
+  .kb-key.shift-active {
+    background: #4CAF50;
+  }
+  
+  .kb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 14px;
+  }
+  
+  .kb-close {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
     font-size: 12px;
   }
-  
-  .keyboard-key.space {
-    min-width: 150px;
-  }
-}
