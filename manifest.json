@@ -1,22 +1,16 @@
 {
-  "manifest_version": 3,
-  "name": "Virtual Keyboard",
-  "version": "1.0",
-  "description": "Shows a virtual keyboard when clicking on text input fields",
-  "permissions": [
-    "activeTab"
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["keyboard.css"]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["keyboard.css"],
-      "matches": ["<all_urls>"]
-    }
-  ]
-}
+    "manifest_version": 3,
+    "name": "Virtual Keyboard Test",
+    "version": "1.0",
+    "description": "Test virtual keyboard extension",
+    "permissions": [
+      "activeTab"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["test.js"],
+        "run_at": "document_end"
+      }
+    ]
+  }
